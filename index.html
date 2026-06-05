@@ -465,7 +465,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:va
           <div class="field"><label>Seu nome</label><input type="text" id="lead-nome" placeholder="Como podemos te chamar?" oninput="checkLead()"></div>
           <div class="field"><label>Seu WhatsApp</label><input type="tel" id="lead-fone" placeholder="(00) 00000-0000" oninput="maskPhone(this);checkLead()"></div>
         </div>
-        <button class="btn btn-primary" id="nb1" onclick="go(2)" disabled>Continuar →</button>
+        <button class="btn btn-primary" id="nb1" onclick="salvarLead(); go(2)" disabled>Continuar →</button>
         <p class="disclaimer">Seus dados são usados apenas para envio do resultado personalizado.</p>
       </div>
 
@@ -739,10 +739,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:va
           <div class="kit-select"><div class="kit-radio"><div class="kit-radio-dot"></div></div><div class="kit-select-label">Selecionar este tratamento</div></div>
         </div>
 
-        <a id="wpp-btn" href="https://wa.me/5500000000000?text=Ola!" class="btn btn-wpp" style="margin-top:24px" target="_blank">
+        <a id="wpp-btn" href="https://wa.me/5500000000000?text=Ola!" class="btn btn-wpp" style="margin-top:24px" target="_blank" onclick="salvarCompleto()">
           💬 Quero começar meu tratamento
         </a>
-        <p class="disclaimer">Atendimento personalizado no WhatsApp · Sem compromisso<br>Suplemento alimentar.</p>
+        <p class="disclaimer">Atendimento personalizado no WhatsApp · Sem compromisso<br>Suplemento alimentar. Não substitui tratamento médico. Consulte seu médico.</p>
       </div>
 
     </div>
@@ -750,11 +750,77 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:va
 </section>
 
 <div class="footer">
-  Fignar Gotas · Suplemento alimentar <br>
+  Fignar Gotas · Suplemento alimentar · Não substitui tratamento médico<br>
   Promel Indústria e Comércio de Produtos Naturais Ltda. · CNPJ: 03.603.516/0001-19 · Aut. ANVISA: 6.04.572-1
 </div>
 
 <script>
+// =====================================================
+// GOOGLE SHEETS — URL DO SCRIPT
+// =====================================================
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyZr0T6XyUyLVepqYG6JM4lTOZ5gGwvvekG4mi_4AWySbLn786_V908UO048AN8CBAi/exec';
+
+// =====================================================
+// FUNÇÃO PRINCIPAL DE ENVIO
+// =====================================================
+function enviarParaSheets(payload) {
+  fetch(SHEETS_URL, {
+    method:  'POST',
+    mode:    'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  }).catch(function(err) {
+    console.warn('Sheets: erro ao enviar', err);
+  });
+}
+
+// Passo 1 — salva nome + telefone imediatamente ao continuar
+function salvarLead() {
+  var nome     = document.getElementById('lead-nome').value.trim();
+  var telefone = document.getElementById('lead-fone').value.trim();
+  enviarParaSheets({
+    nome:        nome,
+    telefone:    telefone,
+    diagnostico: '',
+    grau:        '',
+    sintomas:    '',
+    kit:         '(ainda não escolheu)'
+  });
+}
+
+// Passo 10 — salva tudo completo ao clicar no WhatsApp
+function salvarCompleto() {
+  var labelsDiag = {
+    sim:      'Sim, exame confirmou',
+    exame:    'Fez exame mas não entendeu',
+    suspeita: 'Tem suspeita, sem exame',
+    nao:      'Não tem, quer cuidar'
+  };
+  var labelsGrau = {
+    g1:   'Grau 1',
+    g2:   'Grau 2',
+    g3:   'Grau 3',
+    gnao: 'Não sabe'
+  };
+  var labelsKit = {
+    kit1: 'Tratamento Inicial (1 mês) - R$ 197',
+    kit3: 'Tratamento Recomendado (3 meses) - R$ 297',
+    kit5: 'Tratamento Completo (5 meses) - R$ 397'
+  };
+
+  enviarParaSheets({
+    nome:        document.getElementById('lead-nome').value.trim(),
+    telefone:    document.getElementById('lead-fone').value.trim(),
+    diagnostico: labelsDiag[answers['s2']] || 'Não respondeu',
+    grau:        labelsGrau[answers['s3']] || 'Não respondeu',
+    sintomas:    sintomas.size > 0 ? [...sintomas].join(', ') : 'Nenhum marcado',
+    kit:         labelsKit[selectedKit]    || 'Não selecionou'
+  });
+}
+
+// =====================================================
+// LÓGICA DO QUIZ (original)
+// =====================================================
 const stages={
   1:['Passo 1 de 10','Seus dados'],
   2:['Passo 2 de 10','Diagnóstico'],
@@ -844,7 +910,6 @@ function buildS5(){
   const hasSint=sintomas.size>0&&!sintomas.has('nenhum');
   let html='';
 
-  // Bloco principal baseado no grau e sintomas
   if(grau==='g3'){
     html+=`<div class="abox a-red" style="margin-bottom:16px">
       <div class="at">Seu fígado está em estágio crítico</div>
@@ -872,7 +937,6 @@ function buildS5(){
     </div>`;
   }
 
-  // Reflexos na vida — baseados nos sintomas marcados
   const reflxos=[];
   if(sintomas.has('cansaco')) reflxos.push({ico:'😴',txt:'Aquele cansaço que não passa com sono bom — que chega antes do meio-dia, que te faz chegar em casa sem energia pra nada, nem pra ficar com quem você ama. <strong>Isso não é fraqueza. É o fígado sobrecarregado consumindo a sua energia.</strong>'});
   if(sintomas.has('boca')) reflxos.push({ico:'😖',txt:'A boca amarga de manhã que já virou rotina — que você já nem comenta mais porque parece normal. <strong>Não é normal. É o fígado tentando te avisar desde cedo.</strong>'});
@@ -888,7 +952,6 @@ function buildS5(){
     html+=`</div>`;
   }
 
-  // Progressão
   html+=`<div class="grau-row">
     <div class="grau-box g1"><div class="gt">Grau 1</div><div class="gd">Silencioso. Reversão fácil e rápida.</div></div>
     <div class="grau-arr">→</div>
@@ -897,7 +960,6 @@ function buildS5(){
     <div class="grau-box g3"><div class="gt">Grau 3</div><div class="gd">Dano grave. Risco real de cirrose.</div></div>
   </div>`;
 
-  // Fato sobre silêncio
   html+=`<div class="abox a-dark" style="margin-top:8px">
     <div class="at">O detalhe que assusta</div>
     <div class="ab">Gordura no fígado não dói enquanto está progredindo. Você pode passar do grau 1 para o grau 3 sem sentir nenhuma dor. O momento em que você está agora é a janela mais fácil para resolver isso — e essa janela não fica aberta para sempre.</div>
