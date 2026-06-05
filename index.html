@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fignar — Descubra seu tratamento</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --forest:#1a3a2a;
+  --forest2:#2d5a40;
+  --sage:#4a7c59;
+  --mint:#7ec89a;
+  --mint-light:#e8f5ed;
+  --amber:#c8821a;
+  --amber2:#e8a030;
+  --amber-light:#fef7ec;
+  --cream:#faf8f4;
+  --warm-white:#fffdf9;
+  --red:#c0392b;
+  --red-light:#fdf0ee;
+  --text:#1c2b1e;
+  --text2:#5a7060;
+  --text3:#8a9e8f;
+  --border:#d8e8dc;
+  --card:#ffffff;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* HERO */
+.hero{
+  background:var(--forest);
+  padding:52px 24px 64px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg-circle{
+  position:absolute;border-radius:50%;
+  background:rgba(126,200,154,0.06);
+}
+.hero-bg-circle.c1{width:500px;height:500px;top:-150px;right:-150px}
+.hero-bg-circle.c2{width:300px;height:300px;bottom:-100px;left:-80px}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(200,130,26,0.18);
+  border:1px solid rgba(200,130,26,0.35);
+  color:var(--amber2);
+  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:6px 16px;border-radius:30px;margin-bottom:28px;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(28px,6vw,52px);
+  font-weight:900;color:#fff;line-height:1.1;
+  margin-bottom:20px;position:relative;z-index:1;
+}
+.hero h1 em{color:var(--mint);font-style:normal}
+.hero h1 .hl2{color:var(--amber2)}
+.hero-sub{
+  font-size:clamp(15px,2.5vw,17px);
+  color:rgba(255,255,255,0.65);
+  max-width:520px;margin:0 auto 20px;
+  line-height:1.8;
+}
+.hero-urgency{
+  display:inline-block;
+  background:rgba(192,57,43,0.15);
+  border:1px solid rgba(192,57,43,0.3);
+  color:#ff9090;font-size:13px;
+  padding:9px 20px;border-radius:10px;
+  margin-bottom:32px;line-height:1.5;
+}
+.hero-cta{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--sage),var(--mint));
+  color:#fff;font-family:'Plus Jakarta Sans',sans-serif;
+  font-weight:700;font-size:17px;
+  padding:19px 44px;border-radius:60px;
+  text-decoration:none;cursor:pointer;border:none;
+  box-shadow:0 8px 32px rgba(74,124,89,0.45);
+  transition:all .25s;letter-spacing:.2px;
+}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(74,124,89,0.55)}
+.hero-proof{
+  margin-top:22px;
+  display:flex;align-items:center;justify-content:center;
+  gap:20px;flex-wrap:wrap;
+}
+.hero-proof-item{font-size:12px;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:5px}
+.hero-proof-item span{color:var(--mint);font-size:14px}
+
+/* QUIZ WRAPPER */
+.quiz-section{padding:48px 20px 80px;max-width:600px;margin:0 auto}
+.quiz-intro{text-align:center;margin-bottom:32px}
+.quiz-intro h2{font-family:'Playfair Display',serif;font-size:clamp(20px,3.5vw,28px);font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.3}
+.quiz-intro p{font-size:14px;color:var(--text2);line-height:1.7}
+
+/* CARD */
+.quiz-card{
+  background:var(--card);
+  border-radius:24px;
+  box-shadow:0 12px 48px rgba(26,58,42,0.09);
+  overflow:hidden;
+}
+.card-top{
+  background:var(--forest);
+  padding:22px 26px 18px;
+}
+.card-stage{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:5px}
+.card-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;line-height:1.3}
+.pbar-wrap{background:rgba(255,255,255,0.1);border-radius:4px;height:3px;margin-top:14px;overflow:hidden}
+.pbar-fill{height:100%;background:var(--mint);border-radius:4px;transition:width .5s ease}
+
+.card-body{padding:28px 24px}
+.step{display:none}
+.step.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* QUESTION */
+.step-q{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(16px,2.8vw,20px);
+  font-weight:700;color:var(--text);
+  margin-bottom:22px;line-height:1.45;
+}
+.step-q em{color:var(--sage);font-style:normal}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{
+  background:var(--cream);
+  border:2px solid var(--border);
+  border-radius:14px;
+  padding:14px 16px;
+  font-size:15px;color:var(--text);
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:12px;text-align:left;
+  line-height:1.45;
+}
+.opt:hover{border-color:var(--sage);background:var(--mint-light)}
+.opt.sel{border-color:var(--sage);background:var(--mint-light);color:var(--forest);font-weight:600}
+.opt-ico{
+  width:34px;height:34px;min-width:34px;
+  border-radius:10px;background:#fff;
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+
+/* LEAD FORM */
+.lead-form{display:flex;flex-direction:column;gap:16px}
+.field label{font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px}
+.field input{
+  width:100%;padding:14px 16px;
+  border:2px solid var(--border);
+  border-radius:13px;font-size:16px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  color:var(--text);background:var(--cream);
+  transition:border-color .2s;outline:none;
+}
+.field input:focus{border-color:var(--sage);background:#fff}
+.field input::placeholder{color:var(--text3)}
+
+/* SINTOMAS GRID */
+.sint-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.sint-item{
+  background:var(--cream);border:2px solid var(--border);
+  border-radius:13px;padding:13px 12px;
+  font-size:13px;color:var(--text);
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:flex-start;gap:9px;
+  line-height:1.4;
+}
+.sint-item:hover{border-color:var(--sage);background:var(--mint-light)}
+.sint-item.sel{border-color:var(--sage);background:var(--mint-light);color:var(--forest)}
+.chk{
+  width:20px;height:20px;min-width:20px;
+  border-radius:5px;border:2px solid var(--border);
+  background:#fff;display:flex;align-items:center;
+  justify-content:center;transition:all .2s;
+  font-size:11px;font-weight:700;color:#fff;
+  margin-top:1px;
+}
+.sint-item.sel .chk{background:var(--sage);border-color:var(--sage)}
+
+/* ALERT BOXES */
+.abox{border-radius:16px;padding:18px;margin-bottom:14px}
+.a-red{background:var(--red-light);border:2px solid rgba(192,57,43,0.25)}
+.a-amber{background:var(--amber-light);border:2px solid rgba(200,130,26,0.3)}
+.a-green{background:var(--mint-light);border:2px solid rgba(126,200,154,0.5)}
+.a-dark{background:var(--forest);border:2px solid var(--forest2)}
+.abox .at{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:8px;line-height:1.3}
+.a-red .at{color:var(--red)}
+.a-amber .at{color:var(--amber)}
+.a-green .at{color:var(--sage)}
+.a-dark .at{color:#fff}
+.abox .ab{font-size:14px;line-height:1.8;color:var(--text2)}
+.a-dark .ab{color:rgba(255,255,255,0.65)}
+
+/* LIFE IMPACT ITEMS */
+.life-list{display:flex;flex-direction:column;gap:12px;margin:16px 0}
+.life-item{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--cream);border-radius:13px;padding:14px;
+  border:1px solid var(--border);
+}
+.life-ico{font-size:22px;flex-shrink:0;margin-top:1px}
+.life-text{font-size:14px;color:var(--text);line-height:1.7}
+.life-text strong{color:var(--red)}
+.life-text em{color:var(--sage);font-style:normal;font-weight:600}
+
+/* GRAU PROGRESS */
+.grau-row{display:flex;align-items:stretch;gap:0;margin:16px 0}
+.grau-box{flex:1;text-align:center;padding:14px 8px;border-radius:12px}
+.grau-box.g1{background:#fef9e7;border:2px solid #f4d03f}
+.grau-box.g2{background:#fef0e0;border:2px solid #e8a030}
+.grau-box.g3{background:var(--red-light);border:2px solid rgba(192,57,43,0.4)}
+.grau-arr{display:flex;align-items:center;padding:0 6px;font-size:16px;color:var(--text3);flex-shrink:0}
+.grau-box .gt{font-family:'Playfair Display',serif;font-size:clamp(11px,2vw,13px);font-weight:700;margin-bottom:4px}
+.g1 .gt{color:#b7950b}.g2 .gt{color:var(--amber)}.g3 .gt{color:var(--red)}
+.grau-box .gd{font-size:clamp(10px,1.8vw,11px);color:var(--text2);line-height:1.4}
+
+/* STORY */
+.story-card{
+  background:var(--cream);border-radius:16px;
+  padding:20px;margin-bottom:16px;
+  border-left:4px solid var(--red);
+}
+.story-label{
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--red);margin-bottom:10px;
+}
+.story-text{font-size:14px;color:var(--text);line-height:1.85}
+.story-text .sname{font-weight:700;color:var(--forest)}
+.story-text strong{color:var(--red)}
+
+.testi{
+  border-radius:14px;padding:16px;margin-bottom:12px;
+  background:#fff;border:1.5px solid var(--border);
+}
+.testi-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tav{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#fff;
+  flex-shrink:0;
+}
+.tname{font-weight:700;font-size:14px;color:var(--text)}
+.tperiod{font-size:12px;color:var(--sage);margin-top:2px}
+.tstars{color:var(--amber2);font-size:13px;margin-bottom:8px}
+.ttext{font-size:14px;color:var(--text2);line-height:1.8;font-style:italic}
+
+/* PRODUTO */
+.prod-hero{
+  background:var(--forest);
+  border-radius:18px;padding:26px;
+  margin-bottom:18px;text-align:center;
+}
+.prod-name{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:#fff;margin-bottom:4px}
+.prod-sub{font-size:14px;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-box{
+  background:rgba(255,255,255,0.07);
+  border-radius:12px;padding:14px 8px;
+  border:1px solid rgba(255,255,255,0.1);text-align:center;
+}
+.stat-num{font-family:'Playfair Display',serif;font-size:clamp(15px,3vw,21px);font-weight:700;color:var(--mint)}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,0.5);margin-top:5px;line-height:1.4}
+
+.benefit-list{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.benefit-item{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--cream);border-radius:13px;padding:14px;
+  border:1px solid var(--border);
+}
+.benefit-ico{font-size:20px;flex-shrink:0;width:26px;text-align:center;margin-top:2px}
+.benefit-info .bt{font-weight:700;font-size:14px;color:var(--text);margin-bottom:3px}
+.benefit-info .bd{font-size:13px;color:var(--text2);line-height:1.6}
+
+.vs-wrap{background:var(--forest);border-radius:14px;padding:18px;margin-top:14px;text-align:center}
+.vs-wrap p{font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:12px}
+.vs-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.vs-col{border-radius:10px;padding:12px 8px;text-align:center}
+.vs-col.bad{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08)}
+.vs-col.win{background:rgba(126,200,154,0.15);border:1px solid rgba(126,200,154,0.3)}
+.vs-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.vs-col.bad .vs-lbl{color:rgba(255,255,255,0.3)}
+.vs-col.win .vs-lbl{color:var(--mint)}
+.vs-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700}
+.vs-col.bad .vs-name{color:rgba(255,255,255,0.4)}
+.vs-col.win .vs-name{color:var(--mint)}
+.vs-items{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.vs-item{font-size:11px;line-height:1.4}
+.vs-col.bad .vs-item{color:rgba(255,255,255,0.3)}
+.vs-col.win .vs-item{color:rgba(255,255,255,0.7)}
+.vs-mid{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.25)}
+
+/* TRUST */
+.trust-block{
+  background:var(--forest);border-radius:16px;
+  padding:22px;margin-bottom:14px;
+}
+.trust-block h4{
+  font-family:'Playfair Display',serif;font-size:16px;font-weight:700;
+  color:#fff;margin-bottom:16px;padding-bottom:12px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+.trust-row{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.trust-row:last-child{border-bottom:none;padding-bottom:0}
+.trust-ico{font-size:22px;flex-shrink:0;width:30px;text-align:center;margin-top:2px}
+.trust-info .tt{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.trust-info .td{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6}
+
+.video-placeholder{
+  background:var(--cream);border:2px dashed var(--border);
+  border-radius:14px;padding:30px 20px;text-align:center;margin-bottom:14px;
+}
+.vp-ico{font-size:36px;margin-bottom:10px}
+.vp-title{font-weight:700;font-size:14px;color:var(--text);margin-bottom:5px}
+.vp-sub{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* GARANTIA */
+.garantia-hero{
+  background:linear-gradient(135deg,var(--forest2) 0%,var(--sage) 100%);
+  border-radius:18px;padding:28px;text-align:center;margin-bottom:16px;
+}
+.garantia-badge{font-size:48px;margin-bottom:12px}
+.garantia-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.3}
+.garantia-sub{font-size:14px;color:rgba(255,255,255,0.8);line-height:1.75;max-width:400px;margin:0 auto}
+.garantia-steps{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.gs{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--mint-light);border:1.5px solid rgba(126,200,154,0.5);
+  border-radius:12px;padding:14px;
+}
+.gs-num{
+  width:28px;height:28px;min-width:28px;border-radius:50%;
+  background:var(--sage);color:#fff;
+  font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.gs-text{font-size:14px;color:var(--text);line-height:1.6}
+.gs-text strong{color:var(--sage)}
+
+.cmp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.cmp{border-radius:10px;padding:12px;text-align:center}
+.cmp.bad{background:var(--red-light);border:1.5px solid rgba(192,57,43,0.25)}
+.cmp.good{background:var(--mint-light);border:1.5px solid rgba(126,200,154,0.5)}
+.cmp .cn{font-size:11px;font-weight:700;margin-bottom:4px}
+.cmp.bad .cn{color:var(--red)}.cmp.good .cn{color:var(--sage)}
+.cmp .cv{font-size:13px;color:var(--text2);line-height:1.4}
+
+/* KITS */
+.kit{
+  border-radius:16px;padding:20px;
+  border:2px solid var(--border);
+  cursor:pointer;transition:all .25s;
+  margin-bottom:12px;background:#fff;
+  position:relative;
+}
+.kit:hover{border-color:var(--sage);transform:translateY(-1px);box-shadow:0 4px 20px rgba(74,124,89,0.1)}
+.kit.sel{border-color:var(--sage);background:var(--mint-light);box-shadow:0 8px 28px rgba(74,124,89,0.15)}
+.kit-badge-wrap{min-height:20px;margin-bottom:10px}
+.kit-badge{
+  display:inline-block;
+  background:var(--sage);color:#fff;
+  font-size:10px;font-weight:700;letter-spacing:.5px;
+  padding:4px 12px;border-radius:20px;
+}
+.kit-badge.top{background:var(--amber)}
+.kit-main{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.kit-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text);margin-bottom:3px}
+.kit-dur{font-size:12px;color:var(--text2)}
+.kit-price-day{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:var(--sage);line-height:1}
+.kit-price-day-lbl{font-size:11px;color:var(--text2);margin-top:3px;text-align:right}
+.kit-divider{height:1px;background:var(--border);margin-bottom:12px}
+.kit.sel .kit-divider{background:rgba(74,124,89,0.2)}
+.kit-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.kit-total{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)}
+.kit-old{font-size:13px;color:var(--red);text-decoration:line-through;display:block;margin-bottom:2px}
+.kit-discount{display:inline-block;background:var(--red-light);border:1.5px solid rgba(192,57,43,0.25);color:var(--red);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.kit-frete{font-size:12px;color:var(--sage);font-weight:600}
+.kit-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-top:10px}
+.kit-select{display:flex;align-items:center;gap:8px;margin-top:10px}
+.kit-radio{
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--border);background:#fff;
+  flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;transition:all .2s;
+}
+.kit.sel .kit-radio{border-color:var(--sage);background:var(--sage)}
+.kit-radio-dot{width:8px;height:8px;border-radius:50%;background:#fff;opacity:0;transition:opacity .2s}
+.kit.sel .kit-radio-dot{opacity:1}
+.kit-select-label{font-size:13px;color:var(--text2);font-weight:500}
+.kit.sel .kit-select-label{color:var(--forest);font-weight:600}
+
+/* BUTTONS */
+.btn{
+  width:100%;border:none;border-radius:50px;
+  padding:17px;font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:15px;font-weight:700;cursor:pointer;
+  transition:all .2s;margin-top:20px;letter-spacing:.1px;
+}
+.btn-primary{background:var(--sage);color:#fff;box-shadow:0 4px 18px rgba(74,124,89,0.3)}
+.btn-primary:hover{background:var(--forest2);transform:translateY(-1px)}
+.btn-primary:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;transform:none;box-shadow:none}
+.btn-wpp{background:#25D366;color:#fff;box-shadow:0 4px 22px rgba(37,211,102,0.3);text-decoration:none;display:block;text-align:center}
+.btn-wpp:hover{background:#1db954;transform:translateY(-1px)}
+
+.section-h{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.35}
+.section-note{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px}
+.disclaimer{text-align:center;font-size:12px;color:var(--text3);margin-top:14px;line-height:1.7}
+
+.footer{background:var(--forest);padding:20px;text-align:center;font-size:11px;color:rgba(255,255,255,0.25);line-height:2}
+
+@media(max-width:400px){
+  .sint-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-circle c1"></div>
+  <div class="hero-bg-circle c2"></div>
+  <div class="hero-badge">🍃 Saúde do Fígado</div>
+  <h1>Você se cansa mais<br>do que deveria?<br><em>Pode ser seu fígado.</em></h1>
+  <p class="hero-sub">Descubra em qual estágio você está e qual é o caminho mais rápido para voltar a ter energia, disposição e leveza de verdade — de forma natural.</p>
+  <div class="hero-urgency">⚠ Gordura no fígado avança sem dor. Quando dói, já foi longe.</div>
+  <br>
+  <button class="hero-cta" onclick="document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Descobrir meu caso agora →</button>
+  <div class="hero-proof">
+    <div class="hero-proof-item"><span>✓</span> Leva menos de 2 minutos</div>
+    <div class="hero-proof-item"><span>✓</span> Resultado personalizado</div>
+    <div class="hero-proof-item"><span>✓</span> +20 mil pessoas já trataram</div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="quiz-section" id="quiz">
+  <div class="quiz-intro">
+    <h2>Seu tratamento começa aqui</h2>
+    <p>Responda com honestidade — cada resposta importa para indicar o caminho certo para o seu caso</p>
+  </div>
+  <div class="quiz-card">
+    <div class="card-top">
+      <div class="card-stage" id="stage-lbl">Passo 1 de 10</div>
+      <div class="card-title" id="stage-title">Seus dados</div>
+      <div class="pbar-wrap"><div class="pbar-fill" id="pbar" style="width:0%"></div></div>
+    </div>
+    <div class="card-body">
+
+      <!-- S1: LEAD -->
+      <div class="step active" id="s1">
+        <div class="step-q">Para personalizar seu resultado, precisamos de algumas informações:</div>
+        <div class="lead-form">
+          <div class="field"><label>Seu nome</label><input type="text" id="lead-nome" placeholder="Como podemos te chamar?" oninput="checkLead()"></div>
+          <div class="field"><label>Seu WhatsApp</label><input type="tel" id="lead-fone" placeholder="(00) 00000-0000" oninput="maskPhone(this);checkLead()"></div>
+        </div>
+        <button class="btn btn-primary" id="nb1" onclick="go(2)" disabled>Continuar →</button>
+        <p class="disclaimer">Seus dados são usados apenas para envio do resultado personalizado.</p>
+      </div>
+
+      <!-- S2: DIAGNÓSTICO -->
+      <div class="step" id="s2">
+        <div class="step-q">Você já foi diagnosticado com gordura no fígado?</div>
+        <div class="opts">
+          <div class="opt" onclick="sel(this,'s2','sim')"><div class="opt-ico">✅</div>Sim, o exame confirmou</div>
+          <div class="opt" onclick="sel(this,'s2','exame')"><div class="opt-ico">🔍</div>Fiz exame mas não entendi direito o resultado</div>
+          <div class="opt" onclick="sel(this,'s2','suspeita')"><div class="opt-ico">❓</div>Tenho suspeita, mas ainda não fiz exame</div>
+          <div class="opt" onclick="sel(this,'s2','nao')"><div class="opt-ico">🍃</div>Não tenho, mas quero cuidar do meu fígado</div>
+        </div>
+        <button class="btn btn-primary" id="nb2" onclick="go(3)" disabled>Próximo →</button>
+      </div>
+
+      <!-- S3: GRAU -->
+      <div class="step" id="s3">
+        <div class="step-q">Você sabe em qual <em>grau</em> está?</div>
+        <div class="opts">
+          <div class="opt" onclick="sel(this,'s3','g1')"><div class="opt-ico">🟡</div>Grau 1 — início, o médico disse para acompanhar</div>
+          <div class="opt" onclick="sel(this,'s3','g2')"><div class="opt-ico">🟠</div>Grau 2 — moderado, já sinto alguns sintomas</div>
+          <div class="opt" onclick="sel(this,'s3','g3')"><div class="opt-ico">🔴</div>Grau 3 — avançado, estou preocupado</div>
+          <div class="opt" onclick="sel(this,'s3','gnao')"><div class="opt-ico">❓</div>Não sei / o médico não me informou</div>
+        </div>
+        <button class="btn btn-primary" id="nb3" onclick="go(4)" disabled>Próximo →</button>
+      </div>
+
+      <!-- S4: SINTOMAS -->
+      <div class="step" id="s4">
+        <div class="step-q">O que você sente no dia a dia? <span style="font-size:13px;font-weight:400;color:var(--text2)">(marque tudo que se aplica)</span></div>
+        <div class="sint-grid">
+          <div class="sint-item" onclick="toggleSint(this)" data-s="cansaco"><div class="chk"></div>😴 Cansaço que não passa mesmo dormindo</div>
+          <div class="sint-item" onclick="toggleSint(this)" data-s="boca"><div class="chk"></div>😖 Boca amarga, especialmente de manhã</div>
+          <div class="sint-item" onclick="toggleSint(this)" data-s="dor"><div class="chk"></div>🔴 Peso ou dor no lado direito</div>
+          <div class="sint-item" onclick="toggleSint(this)" data-s="enjoo"><div class="chk"></div>🤢 Enjoo ou vontade de vomitar</div>
+          <div class="sint-item" onclick="toggleSint(this)" data-s="inchaco"><div class="chk"></div>🎈 Barriga inchada que não passa</div>
+          <div class="sint-item" onclick="toggleSint(this)" data-s="peso"><div class="chk"></div>⚖️ Dificuldade para emagrecer mesmo com dieta</div>
+          <div class="sint-item" onclick="toggleSint(this)" data-s="nenhum"><div class="chk"></div>✅ Não sinto nada</div>
+          <div class="sint-item" onclick="toggleSint(this)" data-s="outros"><div class="chk"></div>➕ Outros sintomas</div>
+        </div>
+        <button class="btn btn-primary" onclick="go(5)">Ver o que isso significa →</button>
+      </div>
+
+      <!-- S5: CONSCIÊNCIA -->
+      <div class="step" id="s5">
+        <div id="s5-content"></div>
+        <button class="btn btn-primary" onclick="go(6)">Ver o que acontece com quem ignora →</button>
+      </div>
+
+      <!-- S6: HISTÓRIA + PROVA SOCIAL -->
+      <div class="step" id="s6">
+        <div class="section-h">A história que ninguém quer viver — mas muita gente está vivendo agora</div>
+        <div class="story-card">
+          <div class="story-label">📖 História real</div>
+          <div class="story-text">
+            <span class="sname">Dona Célia, 54 anos.</span> Quando recebeu o diagnóstico de gordura no fígado grau 1, achou que não era nada demais. <em style="font-style:italic;color:var(--text2)">"O médico me mandou fazer dieta. Pensei: isso todo mundo tem."</em>
+            <br><br>
+            Dois anos depois, sem nenhum tratamento, o exame mostrou grau 3. Ela tinha parado de sair com a família porque o cansaço era demais. A roupa não fechava mais. E a dor no lado direito havia virado companheira constante.
+            <br><br>
+            O médico foi direto: <strong>"Se continuar assim, o próximo passo é cirrose. E cirrose não tem cura."</strong>
+            <br><br>
+            Foi aí que ela entendeu que gordura no fígado não é detalhe de exame. É uma doença que rouba sua vida aos poucos — sem você perceber, até não ter mais como ignorar.
+          </div>
+        </div>
+        <div class="testi" style="background:var(--mint-light);border-color:rgba(126,200,154,0.5)">
+          <div class="testi-head">
+            <div class="tav" style="background:var(--sage)">C</div>
+            <div><div class="tname">Célia, 54 anos</div><div class="tperiod">Hoje no grau 1 — quase sem gordura</div></div>
+          </div>
+          <div class="tstars">★★★★★</div>
+          <div class="ttext">"Em 5 meses de tratamento, saí do grau 3 para quase sem gordura no fígado. Voltei a ter energia para caminhar, para estar com meus filhos, para me sentir gente de novo. Não acreditei quando vi o exame."</div>
+        </div>
+        <div class="testi">
+          <div class="testi-head">
+            <div class="tav" style="background:var(--forest2)">M</div>
+            <div><div class="tname">Marília</div><div class="tperiod">2 meses de tratamento</div></div>
+          </div>
+          <div class="tstars">★★★★★</div>
+          <div class="ttext">"A boca amarga sumiu. A dor na barriga foi embora com 2 meses e 7 dias. Acordo com disposição — coisa que não acontecia há anos. O Fignar mudou o meu dia a dia de verdade."</div>
+        </div>
+        <button class="btn btn-primary" onclick="go(7)">Conhecer o que elas usaram →</button>
+      </div>
+
+      <!-- S7: PRODUTO -->
+      <div class="step" id="s7">
+        <div class="prod-hero">
+          <div class="prod-name">Fignar Gotas</div>
+          <div class="prod-sub">O suplemento natural desenvolvido<br>especificamente para a saúde do fígado</div>
+          <div class="stats-row">
+            <div class="stat-box"><div class="stat-num">+3 anos</div><div class="stat-lbl">cuidando de fígados por todo Brasil</div></div>
+            <div class="stat-box"><div class="stat-num">+20 mil</div><div class="stat-lbl">pessoas que voltaram a viver bem</div></div>
+            <div class="stat-box"><div class="stat-num">90%</div><div class="stat-lbl">sentiram melhora seguindo o tratamento</div></div>
+          </div>
+        </div>
+        <div class="benefit-list">
+          <div class="benefit-item">
+            <div class="benefit-ico">⚡</div>
+            <div class="benefit-info">
+              <div class="bt">Você para de se arrastar durante o dia</div>
+              <div class="bd">O cansaço que não passa tem origem no fígado sobrecarregado. Quando o órgão começa a funcionar bem, a energia volta — e você percebe já nas primeiras semanas.</div>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-ico">🌅</div>
+            <div class="benefit-info">
+              <div class="bt">Você acorda sem aquela boca amarga</div>
+              <div class="bd">A boca amarga de manhã é o fígado tentando te avisar que está sobrecarregado. Com o suporte certo, esse sinal some — e você começa o dia diferente.</div>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-ico">⚖️</div>
+            <div class="benefit-info">
+              <div class="bt">A dieta começa a funcionar de verdade</div>
+              <div class="bd">Quando o fígado está com gordura acumulada, o metabolismo trava. Não é falta de força de vontade — é biologia. Com o fígado funcionando, o peso começa a ceder.</div>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-ico">💧</div>
+            <div class="benefit-info">
+              <div class="bt">Em gotas — absorção muito mais rápida</div>
+              <div class="bd">Suplementos em cápsula perdem parte da fórmula no processo digestivo. O Fignar em gotas chega ao fígado com muito mais eficiência — por isso os resultados aparecem mais rápido.</div>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-ico">🌿</div>
+            <div class="benefit-info">
+              <div class="bt">Natural — pode usar junto com outros medicamentos</div>
+              <div class="bd">100% natural, sem contraindicações, sem efeitos colaterais. Inclusive para quem já toma medicamento controlado.</div>
+            </div>
+          </div>
+        </div>
+        <div class="vs-wrap">
+          <p>Compare com o que você encontra na farmácia:</p>
+          <div class="vs-row">
+            <div class="vs-col bad">
+              <div class="vs-lbl">Farmácia comum</div>
+              <div class="vs-name">Remédio genérico</div>
+              <div class="vs-items">
+                <div class="vs-item">❌ Não age no fígado</div>
+                <div class="vs-item">❌ Em cápsula</div>
+                <div class="vs-item">❌ Pode ter efeito colateral</div>
+              </div>
+            </div>
+            <div class="vs-mid">VS</div>
+            <div class="vs-col win">
+              <div class="vs-lbl">Específico</div>
+              <div class="vs-name">Fignar Gotas</div>
+              <div class="vs-items">
+                <div class="vs-item">✓ Fórmula para o fígado</div>
+                <div class="vs-item">✓ Absorção em gotas</div>
+                <div class="vs-item">✓ Sem contraindicação</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:18px" onclick="go(8)">Ver entrega e segurança →</button>
+      </div>
+
+      <!-- S8: SEGURANÇA -->
+      <div class="step" id="s8">
+        <div class="section-h" style="margin-bottom:6px">Sua compra é 100% segura</div>
+        <p class="section-note">Antes de ver os valores, veja o que garante que você está em boas mãos:</p>
+        <div class="trust-block">
+          <h4>🏛️ Produto registrado e fiscalizado</h4>
+          <div class="trust-row">
+            <div class="trust-ico">🏭</div>
+            <div class="trust-info">
+              <div class="tt">Fabricante oficial registrado</div>
+              <div class="td">Promel Indústria e Comércio de Produtos Naturais Ltda. — empresa legalmente registrada, com estrutura física de produção no Brasil.</div>
+            </div>
+          </div>
+          <div class="trust-row">
+            <div class="trust-ico">✅</div>
+            <div class="trust-info">
+              <div class="tt">Autorização ANVISA — Registro 6.04.572-1</div>
+              <div class="td">CNPJ: 03.603.516/0001-19. Aprovado e monitorado pela Agência Nacional de Vigilância Sanitária do governo federal.</div>
+            </div>
+          </div>
+        </div>
+        <div class="trust-block">
+          <h4>📦 Entrega com rastreamento para todo Brasil</h4>
+          <div class="trust-row">
+            <div class="trust-ico">🚚</div>
+            <div class="trust-info">
+              <div class="tt">Correios — código de rastreio garantido</div>
+              <div class="td">Enviamos de Governador Valadares — MG para qualquer cidade do Brasil. Prazo de 7 a 10 dias úteis. Toda compra com nota fiscal eletrônica.</div>
+            </div>
+          </div>
+        </div>
+        <div class="video-placeholder">
+          <div class="vp-ico">▶️</div>
+          <div class="vp-title">Veja o depoimento de quem já recebeu</div>
+          <div class="vp-sub">Cole aqui seu vídeo de prova social da entrega</div>
+        </div>
+        <button class="btn btn-primary" onclick="go(9)">Ver a garantia →</button>
+      </div>
+
+      <!-- S9: GARANTIA -->
+      <div class="step" id="s9">
+        <div class="garantia-hero">
+          <div class="garantia-badge">🛡️</div>
+          <div class="garantia-title">Confiamos tanto no resultado que oferecemos a maior garantia do mercado</div>
+          <div class="garantia-sub">Se você seguir o tratamento e não sentir nenhuma melhora, devolvemos 100% do seu dinheiro. Sem perguntas. Sem enrolação.</div>
+        </div>
+        <div class="garantia-steps">
+          <div class="gs"><div class="gs-num">1</div><div class="gs-text">Use o Fignar pelo período do seu tratamento seguindo as instruções</div></div>
+          <div class="gs"><div class="gs-num">2</div><div class="gs-text">Se não sentir <strong>nenhuma melhora</strong>, entre em contato conosco</div></div>
+          <div class="gs"><div class="gs-num">3</div><div class="gs-text"><strong>Devolvemos 100% do seu dinheiro</strong> — sem perguntas, sem burocracia</div></div>
+        </div>
+        <div style="background:var(--cream);border-radius:14px;padding:16px">
+          <p style="font-size:13px;color:var(--text2);margin-bottom:10px;font-weight:600">Compare com o padrão do mercado:</p>
+          <div class="cmp-row">
+            <div class="cmp bad"><div class="cn">❌ Outros produtos</div><div class="cv">Garantia de 7 dias (mínimo legal)</div></div>
+            <div class="cmp good"><div class="cn">✓ Fignar Gotas</div><div class="cv">Garantia de <strong>60 dias</strong> — mais de 8x o padrão</div></div>
+          </div>
+        </div>
+        <div class="abox a-green" style="margin-top:14px">
+          <div class="at">Sem risco para você</div>
+          <div class="ab">Não sentiu melhora? Pediu reembolso → devolvemos sem questionar. Simples assim. Porque quem segue o tratamento, sente o resultado.</div>
+        </div>
+        <button class="btn btn-primary" onclick="go(10)">Ver os valores →</button>
+      </div>
+
+      <!-- S10: KITS -->
+      <div class="step" id="s10">
+        <div class="section-h" id="s10-title">Escolha o tratamento ideal para você</div>
+        <p class="section-note">Clique no tratamento que faz mais sentido para o seu caso:</p>
+
+        <div class="kit" id="kit5" onclick="selectKit('kit5')">
+          <div class="kit-badge-wrap"><span class="kit-badge top">🏆 Maior economia — 60% de desconto</span></div>
+          <div class="kit-main">
+            <div><div class="kit-name">Tratamento Completo</div><div class="kit-dur">5 meses · Indicado para grau 3</div></div>
+            <div><div class="kit-price-day">R$2,64</div><div class="kit-price-day-lbl">por dia</div></div>
+          </div>
+          <div class="kit-divider"></div>
+          <div class="kit-bottom">
+            <div><div class="kit-old">5 frascos separados: R$ 985,00</div><div class="kit-total">R$ 397,00</div></div>
+            <div style="text-align:right"><div class="kit-discount">Você economiza R$ 588</div><div class="kit-frete">+ frete grátis</div></div>
+          </div>
+          <div class="kit-desc">Para quem está no grau 3 ou quer o resultado mais completo e duradouro. O fígado com dano avançado precisa de tempo — esse ciclo garante isso.</div>
+          <div class="kit-select"><div class="kit-radio"><div class="kit-radio-dot"></div></div><div class="kit-select-label">Selecionar este tratamento</div></div>
+        </div>
+
+        <div class="kit sel" id="kit3" onclick="selectKit('kit3')">
+          <div class="kit-badge-wrap"><span class="kit-badge">⭐ Mais escolhido — 50% de desconto</span></div>
+          <div class="kit-main">
+            <div><div class="kit-name">Tratamento Recomendado</div><div class="kit-dur">3 meses · Indicado para grau 1 e 2</div></div>
+            <div><div class="kit-price-day">R$3,30</div><div class="kit-price-day-lbl">por dia</div></div>
+          </div>
+          <div class="kit-divider"></div>
+          <div class="kit-bottom">
+            <div><div class="kit-old">3 frascos separados: R$ 591,00</div><div class="kit-total">R$ 297,00</div></div>
+            <div style="text-align:right"><div class="kit-discount">Você economiza R$ 294</div><div class="kit-frete">+ frete grátis</div></div>
+          </div>
+          <div class="kit-desc">Menos de R$3,30 por dia para cuidar do seu fígado. O equilíbrio certo entre resultado e investimento — a escolha da maioria dos nossos clientes.</div>
+          <div class="kit-select"><div class="kit-radio"><div class="kit-radio-dot"></div></div><div class="kit-select-label">Selecionar este tratamento</div></div>
+        </div>
+
+        <div class="kit" id="kit1" onclick="selectKit('kit1')">
+          <div class="kit-badge-wrap"></div>
+          <div class="kit-main">
+            <div><div class="kit-name">Tratamento Inicial</div><div class="kit-dur">1 mês · Para dar o primeiro passo</div></div>
+            <div><div class="kit-price-day">R$6,57</div><div class="kit-price-day-lbl">por dia</div></div>
+          </div>
+          <div class="kit-divider"></div>
+          <div class="kit-bottom">
+            <div><div class="kit-total">R$ 197,00</div></div>
+            <div class="kit-frete">+ frete</div>
+          </div>
+          <div class="kit-desc">Para sentir os primeiros resultados antes de continuar o tratamento completo.</div>
+          <div class="kit-select"><div class="kit-radio"><div class="kit-radio-dot"></div></div><div class="kit-select-label">Selecionar este tratamento</div></div>
+        </div>
+
+        <a id="wpp-btn" href="https://wa.me/5500000000000?text=Ola!" class="btn btn-wpp" style="margin-top:24px" target="_blank">
+          💬 Quero começar meu tratamento
+        </a>
+        <p class="disclaimer">Atendimento personalizado no WhatsApp · Sem compromisso<br>Suplemento alimentar.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  Fignar Gotas · Suplemento alimentar <br>
+  Promel Indústria e Comércio de Produtos Naturais Ltda. · CNPJ: 03.603.516/0001-19 · Aut. ANVISA: 6.04.572-1
+</div>
+
+<script>
+const stages={
+  1:['Passo 1 de 10','Seus dados'],
+  2:['Passo 2 de 10','Diagnóstico'],
+  3:['Passo 3 de 10','Qual é o seu grau?'],
+  4:['Passo 4 de 10','Como você se sente'],
+  5:['Passo 5 de 10','O que isso significa'],
+  6:['Passo 6 de 10','Histórias reais'],
+  7:['Passo 7 de 10','A solução'],
+  8:['Passo 8 de 10','Segurança e entrega'],
+  9:['Passo 9 de 10','Sua garantia'],
+  10:['Passo 10 de 10','Seu tratamento']
+};
+const answers={};
+const sintomas=new Set();
+let selectedKit='kit3';
+
+function maskPhone(el){
+  let v=el.value.replace(/\D/g,'');
+  if(v.length>11)v=v.slice(0,11);
+  if(v.length>6)v=v.replace(/^(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+  else if(v.length>2)v=v.replace(/^(\d{2})(\d{0,5})/,'($1) $2');
+  else if(v.length>0)v=v.replace(/^(\d{0,2})/,'($1');
+  el.value=v;
+}
+
+function checkLead(){
+  const n=document.getElementById('lead-nome').value.trim();
+  const f=document.getElementById('lead-fone').value.replace(/\D/g,'');
+  document.getElementById('nb1').disabled=!(n.length>=2&&f.length>=10);
+}
+
+function sel(el,sid,val){
+  el.closest('.opts').querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  answers[sid]=val;
+  const n=sid.replace('s','');
+  const b=document.getElementById('nb'+n);
+  if(b)b.disabled=false;
+}
+
+function toggleSint(el){
+  const s=el.dataset.s;
+  if(s==='nenhum'){
+    document.querySelectorAll('.sint-item').forEach(i=>{
+      i.classList.remove('sel');
+      i.querySelector('.chk').textContent='';
+      sintomas.delete(i.dataset.s);
+    });
+    el.classList.add('sel');
+    el.querySelector('.chk').textContent='✓';
+    sintomas.add('nenhum');
+    return;
+  }
+  if(sintomas.has('nenhum')){
+    const ne=document.querySelector('[data-s="nenhum"]');
+    ne.classList.remove('sel');
+    ne.querySelector('.chk').textContent='';
+    sintomas.delete('nenhum');
+  }
+  if(sintomas.has(s)){
+    sintomas.delete(s);
+    el.classList.remove('sel');
+    el.querySelector('.chk').textContent='';
+  } else {
+    sintomas.add(s);
+    el.classList.add('sel');
+    el.querySelector('.chk').textContent='✓';
+  }
+}
+
+function selectKit(id){
+  ['kit1','kit3','kit5'].forEach(k=>document.getElementById(k).classList.remove('sel'));
+  document.getElementById(id).classList.add('sel');
+  selectedKit=id;
+  const nome=document.getElementById('lead-nome').value.trim();
+  const kits={
+    kit1:'Tratamento Inicial (1 mes) - R$ 197',
+    kit3:'Tratamento Recomendado (3 meses) - R$ 297',
+    kit5:'Tratamento Completo (5 meses) - R$ 397'
+  };
+  const msg=encodeURIComponent('Ola! Me chamo '+nome+'. Fiz o teste do figado e tenho interesse no '+kits[id]+'. Pode me ajudar?');
+  document.getElementById('wpp-btn').href='https://wa.me/5500000000000?text='+msg;
+}
+
+function buildS5(){
+  const grau=answers['s3']||'gnao';
+  const hasSint=sintomas.size>0&&!sintomas.has('nenhum');
+  let html='';
+
+  // Bloco principal baseado no grau e sintomas
+  if(grau==='g3'){
+    html+=`<div class="abox a-red" style="margin-bottom:16px">
+      <div class="at">Seu fígado está em estágio crítico</div>
+      <div class="ab">No grau 3, o fígado já não consegue fazer seu trabalho direito. O cansaço que você sente, o peso que não sai, a dor no lado direito — tudo isso é o reflexo de um órgão que está gritando por socorro. Sem tratamento, o próximo passo é a cirrose. E a cirrose não tem cura.</div>
+    </div>`;
+  } else if(grau==='g2'){
+    html+=`<div class="abox a-amber" style="margin-bottom:16px">
+      <div class="at">Seu fígado está te mandando sinais — e você está ouvindo</div>
+      <div class="ab">O cansaço, a boca amarga, a barriga que não desincha — não é coincidência e não é frescura. É o seu fígado sobrecarregado pedindo suporte. A boa notícia: no grau 2, ainda dá para reverter com muito mais facilidade do que no grau 3.</div>
+    </div>`;
+  } else if(grau==='g1'&&hasSint){
+    html+=`<div class="abox a-amber" style="margin-bottom:16px">
+      <div class="at">Grau 1 com sintomas — atenção redobrada</div>
+      <div class="ab">O grau 1 costuma ser silencioso. Se você já sente sintomas, significa que o fígado está mais sobrecarregado do que o número sugere. Agir agora é muito mais simples — e muito mais barato — do que esperar evoluir.</div>
+    </div>`;
+  } else if(grau==='g1'){
+    html+=`<div class="abox a-amber" style="margin-bottom:16px">
+      <div class="at">Grau 1 — o silêncio que engana</div>
+      <div class="ab">Não sentir nada é o maior perigo do grau 1. O fígado aguenta muito antes de pedir socorro. Mas enquanto você não sente nada, a gordura continua se acumulando. E quando o sintoma aparecer, o grau já avançou. Agir agora é simples. Esperar, não.</div>
+    </div>`;
+  } else {
+    html+=`<div class="abox a-amber" style="margin-bottom:16px">
+      <div class="at">Gordura no fígado — a doença que não avisa</div>
+      <div class="ab">A maioria das pessoas descobre por acaso, num exame de rotina. O fato de você estar aqui já mostra que está no caminho certo — porque quem descobre cedo, resolve com muito mais facilidade.</div>
+    </div>`;
+  }
+
+  // Reflexos na vida — baseados nos sintomas marcados
+  const reflxos=[];
+  if(sintomas.has('cansaco')) reflxos.push({ico:'😴',txt:'Aquele cansaço que não passa com sono bom — que chega antes do meio-dia, que te faz chegar em casa sem energia pra nada, nem pra ficar com quem você ama. <strong>Isso não é fraqueza. É o fígado sobrecarregado consumindo a sua energia.</strong>'});
+  if(sintomas.has('boca')) reflxos.push({ico:'😖',txt:'A boca amarga de manhã que já virou rotina — que você já nem comenta mais porque parece normal. <strong>Não é normal. É o fígado tentando te avisar desde cedo.</strong>'});
+  if(sintomas.has('peso')) reflxos.push({ico:'⚖️',txt:'Você faz dieta, se esforça, e a balança não anda. Não é falta de força de vontade. <strong>Quando o fígado está com gordura acumulada, o metabolismo trava — e nenhuma dieta do mundo resolve enquanto isso não for tratado.</strong>'});
+  if(sintomas.has('dor')) reflxos.push({ico:'🔴',txt:'Aquele peso ou dor no lado direito que aparece quando você se abaixa ou faz esforço. <strong>É o fígado sobrecarregado reagindo ao esforço de funcionar com gordura acumulada.</strong>'});
+  if(sintomas.has('inchaco')) reflxos.push({ico:'🎈',txt:'A barriga que incha independente do que você come — que não passa nem com dieta. <strong>É o fígado não conseguindo metabolizar gorduras direito.</strong>'});
+  if(sintomas.has('enjoo')) reflxos.push({ico:'🤢',txt:'O enjoo que aparece sem motivo claro, às vezes depois de refeições, às vezes do nada. <strong>É o fígado sobrecarregado não conseguindo processar o que você ingere.</strong>'});
+
+  if(reflxos.length>0){
+    html+=`<p style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">O que os seus sintomas estão dizendo:</p>`;
+    html+=`<div class="life-list">`;
+    reflxos.forEach(r=>{html+=`<div class="life-item"><div class="life-ico">${r.ico}</div><div class="life-text">${r.txt}</div></div>`;});
+    html+=`</div>`;
+  }
+
+  // Progressão
+  html+=`<div class="grau-row">
+    <div class="grau-box g1"><div class="gt">Grau 1</div><div class="gd">Silencioso. Reversão fácil e rápida.</div></div>
+    <div class="grau-arr">→</div>
+    <div class="grau-box g2"><div class="gt">Grau 2</div><div class="gd">Sintomas aparecem. Tratamento mais longo.</div></div>
+    <div class="grau-arr">→</div>
+    <div class="grau-box g3"><div class="gt">Grau 3</div><div class="gd">Dano grave. Risco real de cirrose.</div></div>
+  </div>`;
+
+  // Fato sobre silêncio
+  html+=`<div class="abox a-dark" style="margin-top:8px">
+    <div class="at">O detalhe que assusta</div>
+    <div class="ab">Gordura no fígado não dói enquanto está progredindo. Você pode passar do grau 1 para o grau 3 sem sentir nenhuma dor. O momento em que você está agora é a janela mais fácil para resolver isso — e essa janela não fica aberta para sempre.</div>
+  </div>`;
+
+  document.getElementById('s5-content').innerHTML=html;
+}
+
+function buildS10(){
+  const nome=document.getElementById('lead-nome').value.trim();
+  const grau=answers['s3']||'gnao';
+  if(nome) document.getElementById('s10-title').textContent='Ótimo, '+nome+'! Escolha o seu tratamento';
+  if(grau==='g3'){selectKit('kit5');}else{selectKit('kit3');}
+}
+
+function go(to){
+  const cur=to-1;
+  document.getElementById('s'+cur).classList.remove('active');
+  if(to===5) buildS5();
+  if(to===10) buildS10();
+  document.getElementById('s'+to).classList.add('active');
+  const pct=Math.round(((to-1)/10)*100);
+  document.getElementById('pbar').style.width=pct+'%';
+  document.getElementById('stage-lbl').textContent=stages[to][0];
+  document.getElementById('stage-title').textContent=stages[to][1];
+  document.getElementById('quiz').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>
